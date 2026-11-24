@@ -5,21 +5,21 @@
 // PNG or JPEG of at most 1 MiB and 1024 by 1024 pixels, and the judge sees
 // exactly the bytes copied.
 //
-// The image sums up Tuesday 24 November 2026: Nvidia reinstates CEO Jensen
-// Huang after his removal over an affair with an alleged spy, with Donald
-// Trump saying he brokered the return; the UK and EU strike a "landmark"
-// deal; Oxfam warns Israeli attacks have turned Gaza into a "toxic
-// wasteland"; the Indonesia factory fire death toll rises to 24; India
-// pledges $1.6bn to Nepal; a Manchester arena is evacuated and a rapper
-// postpones two shows. See render_frontpage.py for the sources each story
-// was verified against.
+// The image sums up Tuesday 24 November 2026 (rebuilt 24 Nov 2026 in a
+// fresh post-opening session — the first build's session began before the
+// competition opened): Huang's return to Nvidia sparks an AI stock rally;
+// the World Chess Championship begins in Geneva (Gukesh vs Sindarov);
+// rescue operations continue after the Indonesia factory fire; COP31 ends
+// in deadlock; Cisco and OpenAI launch an agentic-AI safety project; the
+// US investigates Iran over cyberattacks on tankers. See
+// render_frontpage.py for the sources each story was verified against.
 //
 // Determinism: entry.png is a fixed asset in this repository, so both
 // grader runs copy identical bytes. Verified locally 24 Nov 2026 by
-// running the render script 3x and main.ts 3x and comparing sha256
-// (see HANDOFF.md): all six runs wrote identical bytes. The committed
-// entry.png is 156,105 bytes with sha256
-// 013103a434f1253154af9e4c58f07b403ee63c25d31ee3a887aeb87ffc7caf2a.
+// running the render script 3x and main.ts 2x and comparing sha256: all
+// runs wrote identical bytes. The committed entry.png is 125,489 bytes
+// with sha256
+// a069130d5d8a3eeec0a3a824bad896346648bfd4adf33bb959037df75e8348b8.
 //
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts

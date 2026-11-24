@@ -1,44 +1,43 @@
 #!/usr/bin/env python3
-"""Draw the 24 November 2026 news front page (1024x1024 PNG).
+"""Draw the 24 November 2026 world-news front page (1024x1024 PNG).
 
-Fresh render for the news-image-20261124 bounty. Pillow only, no network,
-no randomness: the same script always writes identical bytes.
+Fresh rebuild for the news-image-20261124 bounty, written in this session.
+Pillow only, no network, no randomness: the same script always writes
+identical bytes. New broadsheet layout (masthead, lead with a drawn market
+chart, chessboard panel, three-column middle, footer strip).
 
-Stories (verified by web search on 24 Nov 2026, sources: BBC, Reuters,
-The Times of India / Education Times, Jagran Josh, Disclosure News):
-- LEAD: Nvidia reinstates CEO Jensen Huang after an affair with an alleged
-  spy; Donald Trump says "I made the deal". (BBC)
-- UK-EU: Burnham hails a "landmark" UK-EU deal, saying it could make the
-  next decade "much better". (BBC)
-- Gaza: Israeli attacks have turned Gaza into a "toxic wasteland", Oxfam
-  and the Conflict and Environment Observatory say. (BBC / Oxfam)
-- Indonesia: factory fire death toll rises to 24; rescuers still search
-  for around 30 missing workers. (Times of India / Lexington Herald Leader)
-- India-Nepal: India pledges $1.6bn to Nepal in a reset of ties; PM Modi
-  and Nepal PM Balendra Shah flag off the Saryu-Kamala Express. (BBC)
-- Manchester: US rapper postpones arena shows after the Co-op Live
-  evacuation over an unknown substance. (BBC)
-- Also today: Carlos Alcaraz wins a maiden ATP Finals title; the World
-  Chess Championship begins in Geneva (Gukesh defends vs Sindarov); Max
-  Verstappen wins the Las Vegas Grand Prix; the NHS launches the world's
-  largest AI breast-cancer screening trial; Tyson Fury reveals a
-  schizophrenia diagnosis; BepiColombo enters orbit around Mercury.
+Stories — events of, or first reported on, Tuesday 24 November 2026,
+verified by public web search on 24 Nov 2026 (sources in brackets):
+- LEAD: Jensen Huang's return to Nvidia sparks an AI stock rally across
+  Asia and Europe; the US is investigating Iran over cyberattacks on
+  energy tankers. [Morningstar / Dow Jones EMEA Morning Briefing, 24 Nov]
+- Chess: the World Chess Championship begins in Geneva — defending
+  champion D. Gukesh vs challenger Javokhir Sindarov, 14 games, $2.5m.
+  [Reporter Post; DD News, 24 Nov]
+- Indonesia: rescue operations continue after a factory fire leaves
+  workers dead and missing. [Careerindia news bulletin, 24 Nov]
+- Climate: COP31 ends in deadlock with no deal; Pacific islands get no
+  relief. [PINA, 24 Nov]
+- Tech: Cisco and OpenAI launch an open-source project to safeguard
+  agentic AI. [Morningstar / Dow Jones, 24 Nov]
+- Also today: India-New Zealand Wellington Test ends in a draw; Modi and
+  Nepal PM Balendra Shah discuss closer ties; BepiColombo is safe in
+  orbit around Mercury after a thruster glitch; about 12,000 people
+  evacuated from a Manchester arena show over a mystery substance.
+  [Careerindia; Morningstar; Reuters; news summaries, 24 Nov]
 """
 
-import math
 import textwrap
 from PIL import Image, ImageDraw, ImageFont
 
 W, H = 1024, 1024
-PAPER = (253, 246, 227)
-INK = (26, 26, 26)
-NAVY = (20, 33, 61)
-GREEN = (76, 185, 0)
-DARKGREEN = (11, 122, 62)
-RED = (185, 28, 28)
-GOLD = (180, 130, 29)
-GREY = (90, 90, 90)
-RULE = (26, 26, 26)
+PAPER = (250, 244, 228)
+INK = (24, 24, 24)
+NAVY = (18, 38, 66)
+GREEN = (16, 122, 62)
+RED = (178, 34, 34)
+GREY = (96, 96, 96)
+RULE = (24, 24, 24)
 
 SERIF_B = "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf"
 SERIF = "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"
@@ -52,7 +51,7 @@ def font(path, size):
 
 img = Image.new("RGB", (W, H), PAPER)
 d = ImageDraw.Draw(img)
-M = 36
+M = 34
 x0, x1 = M, W - M
 
 
@@ -60,12 +59,11 @@ def text_w(s, f):
     return d.textlength(s, font=f)
 
 
-def wrap(s, f, width):
+def wrap_px(s, f, width):
     out = []
-    for para in s.split("\n"):
-        words = para.split()
+    for para_text in s.split("\n"):
         cur = ""
-        for w in words:
+        for w in para_text.split():
             trial = (cur + " " + w).strip()
             if text_w(trial, f) <= width:
                 cur = trial
@@ -78,235 +76,138 @@ def wrap(s, f, width):
     return out
 
 
-def para(x, y, s, f, width, fill=INK, leading=1.28):
+def para(x, y, s, f, width, leading=1.28, fill=INK):
     lh = int(f.size * leading)
-    for ln in wrap(s, f, width):
+    for ln in wrap_px(s, f, width):
         d.text((x, y), ln, font=f, fill=fill)
         y += lh
     return y
 
 
-def hline(y, width=2):
+def rule(y, width=2):
     d.line([(x0, y), (x1, y)], fill=RULE, width=width)
-    return y + width
-
-
-def check_y(y, label):
-    assert y <= 1010, f"overflow at {label}: y={y}"
     return y
 
 
-# ---------- top dateline bar ----------
-y = 20
-f_date = font(SANS_B, 19)
-d.text((x0, y), "TUESDAY 24 NOVEMBER 2026", font=f_date, fill=NAVY)
-right = "THE DAY IN ONE PICTURE"
-d.text((x1 - text_w(right, f_date), y), right, font=f_date, fill=NAVY)
-y = check_y(y + 26, "dateline")
-y = hline(y, width=3)
+d.rectangle([8, 8, W - 9, H - 9], outline=INK, width=3)
 
-# ---------- masthead ----------
+# ---- masthead ----
+y = 24
+f_mast = font(SERIF_B, 66)
+d.text((x0, y), "THE WORLD", font=f_mast, fill=NAVY)
+d.text((x1 - 150, y + 20), "ONE DAY", font=font(SANS_B, 24), fill=RED)
+y = 108
+rule(y)
+y += 8
+d.text((x0, y), "TUESDAY, 24 NOVEMBER 2026", font=font(SANS_B, 22), fill=INK)
+d.text((x1 - 300, y), "THE DAY IN FULL", font=font(SANS, 22), fill=GREY)
+y += 32
+rule(y, width=3)
+
+# ---- lead story (left) + chess panel (right) ----
+y += 14
+top = y
+lead_x = x0
+lead_w = 590
+d.text((lead_x, y), "AI RALLY AFTER", font=font(SERIF_B, 38), fill=INK)
+y += 44
+d.text((lead_x, y), "HUANG'S RETURN", font=font(SERIF_B, 38), fill=INK)
+y += 48
+y = para(lead_x, y,
+         "Nvidia reinstated Jensen Huang as chief executive on Monday, "
+         "and AI stocks rallied across Asia and Europe on Tuesday as risk "
+         "appetite returned. The board cited input from senior levels of "
+         "the US government.",
+         font(SERIF, 20), lead_w, leading=1.3)
 y += 4
-f_mast = font(SERIF_B, 84)
-title = "THE WORLD"
-d.text(((W - text_w(title, f_mast)) / 2, y), title, font=f_mast, fill=NAVY)
-y = check_y(y + 92, "masthead")
-f_tag = font(SERIF, 21)
-tag = "Sum up Tuesday's world news in a single image"
-d.text(((W - text_w(tag, f_tag)) / 2, y), tag, font=f_tag, fill=GREY)
-y = check_y(y + 26, "tagline")
-y = hline(y + 2, width=3)
+# Drawn market chart: rising green line with arrowhead — code-drawn.
+cx, cy, cw, ch = lead_x, y, 580, 118
+d.rectangle([cx, cy, cx + cw, cy + ch], outline=GREY, width=1)
+pts = [(cx + 10 + i * 57, cy + ch - 26 - v) for i, v in
+       enumerate([0, 8, 4, 22, 18, 38, 34, 58, 52, 78, 92])]
+for a, b in zip(pts, pts[1:]):
+    d.line([a, b], fill=GREEN, width=5)
+d.polygon([(pts[-1][0], pts[-1][1] - 12), (pts[-1][0] + 14, pts[-1][1] + 2),
+           (pts[-1][0] - 2, pts[-1][1] + 10)], fill=GREEN)
+d.text((cx + 6, cy + 5), "AI STOCKS, TUESDAY", font=font(SANS_B, 14), fill=GREEN)
+d.text((cx + cw - 110, cy + ch - 22), "UP SHARPLY", font=font(SANS_B, 14), fill=GREEN)
+y = cy + ch + 10
+y = para(lead_x, y,
+         "Also: the US is investigating Iran as a possible culprit in "
+         "dozens of cyberattacks on energy tankers.",
+         font(SERIF, 19), lead_w, leading=1.28)
+lead_bottom = y
 
-# ---------- LEAD: Nvidia ----------
-y += 6
-f_kick = font(SANS_B, 19)
-d.text((x0, y), "LEAD  •  TECHNOLOGY", font=f_kick, fill=DARKGREEN)
-y += 24
-lead_top = y
-f_lead = font(SERIF_B, 44)
-for ln in ["HUANG IS BACK:", "NVIDIA REINSTATES"]:
-    d.text((x0, y), ln, font=f_lead, fill=INK)
-    y += 50
-y += 2
-f_sub = font(SERIF, 22)
-y = para(x0, y,
-         "its chief executive — days after his shock\n"
-         "removal over an affair with an alleged spy.",
-         f_sub, 560)
-y += 6
-f_body = font(SANS, 19)
-y = para(x0, y,
-         "Donald Trump says he brokered the return:\n"
-         "\u201cI made the deal.\u201d A week of turmoil ends.",
-         f_body, 560)
+# ---- chess panel (right column) ----
+rx = lead_x + lead_w + 24
+ry = top
+d.rectangle([rx, ry, x1, lead_bottom], outline=NAVY, width=2)
+d.text((rx + 12, ry + 10), "CHESS CROWN", font=font(SANS_B, 19), fill=NAVY)
+d.text((rx + 12, ry + 34), "ON THE LINE", font=font(SANS_B, 19), fill=NAVY)
+bx, by, sq = rx + 12, ry + 64, 26
+for r in range(8):
+    for c in range(8):
+        fill = (240, 234, 220) if (r + c) % 2 == 0 else NAVY
+        d.rectangle([bx + c * sq, by + r * sq,
+                     bx + (c + 1) * sq, by + (r + 1) * sq], fill=fill)
+d.text((bx + 2 * sq + 4, by + 2), "K", font=font(SERIF_B, 20), fill=INK)
+d.text((bx + 6 * sq + 4, by + 5 * sq + 2), "K", font=font(SERIF_B, 20),
+       fill=(240, 234, 220))
+ty = by + 8 * sq + 8
+ty = para(rx + 12, ty,
+          "World Chess Championship begins in Geneva: Gukesh defends his "
+          "crown against Sindarov — 14 games, $2.5m.",
+          font(SERIF, 17), x1 - rx - 24, leading=1.28)
 
-# chip graphic, right of lead text
-gx, gy = 640, lead_top - 4
-gw, gh = 316, 168
-d.rounded_rectangle([gx, gy, gx + gw, gy + gh], radius=18,
-                    fill=(18, 38, 32), outline=GREEN, width=4)
-for i in range(5):
-    px = gx + 40 + i * 56
-    d.line([(px, gy - 14), (px, gy)], fill=GREEN, width=6)
-    d.line([(px, gy + gh), (px, gy + gh + 14)], fill=GREEN, width=6)
-    py = gy + 32 + i * 34
-    d.line([(gx - 14, py), (gx, py)], fill=GREEN, width=6)
-    d.line([(gx + gw, py), (gx + gw + 14, py)], fill=GREEN, width=6)
-f_chip = font(SANS_B, 54)
-chip_txt = "NVDA"
-d.text((gx + (gw - text_w(chip_txt, f_chip)) / 2, gy + 36),
-       chip_txt, font=f_chip, fill=GREEN)
-f_chip2 = font(SANS_B, 22)
-ct2 = "CEO RETURNS"
-d.text((gx + (gw - text_w(ct2, f_chip2)) / 2, gy + 100),
-       ct2, font=f_chip2, fill=(253, 246, 227))
-f_arrow = font(SANS_B, 18)
-at = "\u21a9 U-TURN"
-d.text((gx + (gw - text_w(at, f_arrow)) / 2, gy + 134),
-       at, font=f_arrow, fill=(255, 120, 90))
+# ---- middle band: three columns ----
+y = lead_bottom + 14
+rule(y, width=3)
+y += 12
+col_w = (x1 - x0 - 48) // 3
+cols = [
+    ("INDONESIA", "Factory fire rescue",
+     "Rescue operations continue after a major fire at an industrial "
+     "facility, with casualties and workers still missing."),
+    ("CLIMATE", "COP31 ends in deadlock",
+     "Climate talks end with no deal and no relief for Pacific islands "
+     "after the collapse of the Antalya pact."),
+    ("TECH", "Safeguarding agentic AI",
+     "Cisco and OpenAI launch an open-source project to safeguard "
+     "agentic AI and prevent cyberattacks."),
+]
+ends = []
+for i, (kicker, head, body) in enumerate(cols):
+    cx = x0 + i * (col_w + 24)
+    d.text((cx, y), kicker, font=font(SANS_B, 16), fill=RED)
+    yy = para(cx, y + 22, head, font(SERIF_B, 23), col_w, leading=1.12)
+    yy = para(cx, yy + 4, body, font(SERIF, 18), col_w, leading=1.26)
+    ends.append(yy)
+    if i < 2:
+        d.line([(cx + col_w + 12, y), (cx + col_w + 12, yy)],
+               fill=GREY, width=1)
+mid_bottom = max(ends)
 
-y = max(y, gy + gh + 8)
-y = check_y(y, "lead")
-y = hline(y + 4, width=2)
-
-
-def panel(x, y, w, kick, headline, body, accent):
-    d.text((x, y), kick, font=font(SANS_B, 17), fill=accent)
-    y2 = y + 23
-    y2 = para(x, y2, headline, font(SERIF_B, 25), w, leading=1.12)
-    y2 += 3
-    y2 = para(x, y2, body, font(SANS, 17), w, leading=1.28)
-    return y2
-
-
-col_w = (x1 - x0 - 28) // 2
-
-# ---------- Row 2 ----------
-y += 6
-row2_top = y
-end_a = panel(x0, y, col_w, "BRITAIN  •  EUROPE",
-              "UK and EU strike\n\u201clandmark\u201d deal",
-              "Burnham says the deal could make the\n"
-              "next decade \u201cmuch better\u201d.",
-              NAVY)
-sx, sy = x0 + col_w - 88, row2_top + 56
-for i in range(12):
-    ang = 2 * math.pi * i / 12 - math.pi / 2
-    cx = sx + 40 + int(32 * math.cos(ang))
-    cy = sy + 40 + int(32 * math.sin(ang))
-    d.ellipse([cx - 4, cy - 4, cx + 4, cy + 4], fill=GOLD)
-d.text((sx + 24, sy + 31), "EU", font=font(SANS_B, 24), fill=NAVY)
-end_b = panel(x0 + col_w + 28, y, col_w, "GAZA  •  ENVIRONMENT",
-              "Gaza a \u201ctoxic\nwasteland\u201d, Oxfam warns",
-              "Israeli attacks have left air, soil and\n"
-              "water dangerous for decades.",
-              RED)
-tx, ty = x0 + col_w + 28 + col_w - 92, row2_top + 62
-d.polygon([(tx + 40, ty), (tx + 80, ty + 68), (tx, ty + 68)],
-          outline=RED, width=5)
-d.text((tx + 33, ty + 22), "!", font=font(SANS_B, 36), fill=RED)
-y = check_y(max(end_a, end_b) + 8, "row2")
-y = hline(y, width=1)
-
-# ---------- Row 3 ----------
-y += 6
-row3_top = y
-end_a = panel(x0, y, col_w, "INDONESIA",
-              "Factory fire toll\nrises to 24",
-              "Rescuers still search for around 30\n"
-              "missing workers in Banten.",
-              RED)
-fx, fy = x0 + col_w - 80, row3_top + 48
-d.polygon([(fx + 32, fy), (fx + 58, fy + 32), (fx + 48, fy + 28),
-           (fx + 62, fy + 62), (fx + 32, fy + 82), (fx + 2, fy + 62),
-           (fx + 16, fy + 28), (fx + 6, fy + 32)],
-          fill=(232, 90, 12))
-d.ellipse([fx + 21, fy + 44, fx + 43, fy + 66], fill=(255, 190, 0))
-end_b = panel(x0 + col_w + 28, y, col_w, "INDIA  •  NEPAL",
-              "India pledges $1.6bn\nto Nepal",
-              "Modi and Nepal's PM flag off the\n"
-              "Saryu-Kamala Express.",
-              DARKGREEN)
-mx, my = x0 + col_w + 28 + col_w - 116, row3_top + 52
-d.polygon([(mx, my + 72), (mx + 38, my), (mx + 76, my + 72)],
-          fill=NAVY)
-d.polygon([(mx + 42, my + 72), (mx + 80, my + 12), (mx + 114, my + 72)],
-          fill=(70, 90, 130))
-d.polygon([(mx + 31, my + 14), (mx + 38, my), (mx + 45, my + 14)],
-          fill=(255, 255, 255))
-y = check_y(max(end_a, end_b) + 8, "row3")
-y = hline(y, width=1)
-
-# ---------- Row 4: Manchester + By numbers ----------
-y += 6
-row4_top = y
-end_a = panel(x0, y, col_w, "MANCHESTER",
-              "Arena evacuated;\nrapper postpones shows",
-              "Two Co-op Live shows called off after\n"
-              "an unknown substance forced a clear-out.",
-              NAVY)
-bx = x0 + col_w + 28
-by = y
-bw = col_w
-bh = 126
-d.rectangle([bx, by, bx + bw, by + bh], outline=NAVY, width=3)
-d.rectangle([bx, by, bx + bw, by + 32], fill=NAVY)
-d.text((bx + 12, by + 6), "THE DAY BY NUMBERS",
-       font=font(SANS_B, 17), fill=(253, 246, 227))
-nums = [("24", "dead in the Indonesia factory fire"),
-        ("$1.6bn", "India's pledge to Nepal"),
-        ("2", "Manchester arena shows postponed"),
-        ("1st", "ATP Finals title for Alcaraz")]
-ny = by + 36
-for n, label in nums:
-    d.text((bx + 12, ny), n, font=font(SANS_B, 19), fill=RED)
-    d.text((bx + 88, ny + 1), label, font=font(SANS, 18), fill=INK)
-    ny += 20
-y = check_y(max(end_a, by + bh) + 8, "row4")
-y = hline(y, width=2)
-
-# ---------- Also today strip (two columns) ----------
-y += 6
+# ---- footer strip: also today ----
+y = mid_bottom + 14
+rule(y, width=3)
+y += 10
 d.text((x0, y), "ALSO TODAY", font=font(SANS_B, 19), fill=NAVY)
-y += 26
-f_item = font(SANS, 17)
-col2_x = x0 + col_w + 28
-left_items = [
-    "Alcaraz wins a maiden ATP Finals title.",
-    "Chess Championship begins in Geneva.",
-    "Verstappen wins the Las Vegas GP.",
-]
-right_items = [
-    "NHS launches huge AI breast-cancer trial.",
-    "Tyson Fury reveals schizophrenia diagnosis.",
-    "BepiColombo enters orbit around Mercury.",
-]
-iy = y
-for it in left_items:
-    d.text((x0 + 12, iy), "\u2022", font=f_item, fill=NAVY)
-    iy = para(x0 + 30, iy, it, f_item, col_w - 30, leading=1.22)
-    iy += 3
-jy = y
-for it in right_items:
-    d.text((col2_x + 12, jy), "\u2022", font=f_item, fill=NAVY)
-    jy = para(col2_x + 30, jy, it, f_item, col_w - 30, leading=1.22)
-    jy += 3
-y = check_y(max(iy, jy), "also today")
-y = hline(y + 4, width=2)
-
-# ---------- footer ----------
+y += 28
+y = para(x0, y,
+         "India–New Zealand Wellington Test ends in a draw  •  Modi and "
+         "Nepal PM Balendra Shah discuss closer ties  •  BepiColombo safe "
+         "in orbit around Mercury after a thruster glitch  •  About 12,000 "
+         "evacuated from a Manchester arena show.",
+         font(SERIF, 18), x1 - x0, leading=1.28)
+y += 8
+rule(y, width=1)
 y += 6
-f_foot = font(SANS, 15)
-foot = ("Sources: BBC, Reuters, The Times of India, Jagran Josh, Disclosure News  •  "
-        "All graphics drawn — no photographs")
-d.text((x0, y), foot, font=f_foot, fill=GREY)
-y += 18
-f_foot2 = font(SANS_B, 14)
-f2 = "THE WORLD — 24 NOVEMBER 2026  •  Drawn with Pillow, no network, no randomness"
-d.text(((W - text_w(f2, f_foot2)) / 2, y), f2, font=f_foot2, fill=NAVY)
+d.text((x0, y), "Sources: Morningstar / Dow Jones, Reuters, Reporter Post, DD News, "
+                "Careerindia, PINA  •  All graphics drawn — no photographs",
+       font=font(SANS, 13), fill=GREY)
 y += 20
-assert y <= 1024, f"final y {y} exceeds 1024"
+assert y <= 1010, f"layout overflow: final y={y}"
 print(f"final y = {y}")
 
-img.save("entry.png", optimize=True)
-print("saved entry.png")
+img.save("entry.png", format="PNG")
+print("saved entry.png", img.size)
